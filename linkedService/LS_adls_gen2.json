@@ -1,0 +1,10 @@
+{
+	"name": "LS_adls_gen2",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://caresyncstoragedip.dfs.core.windows.net/"
+		}
+	}
+}
