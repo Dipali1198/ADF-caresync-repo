@@ -5,12 +5,6 @@
 		"factoryName": {
 			"value": "adf-caresyncdip"
 		},
-		"LS_PostgreSql_password": {
-			"value": ""
-		},
-		"LS_AzureKeyVault_properties_typeProperties_baseUrl": {
-			"value": "https://caresynckeydip.vault.azure.net/"
-		},
 		"LS_PostgreSql_properties_typeProperties_server": {
 			"value": "ep-misty-wave-b3p8t579-pooler.c-4.ap-southeast-1.aws.neon.tech"
 		},
@@ -22,6 +16,18 @@
 		},
 		"LS_adls_gen2_properties_typeProperties_url": {
 			"value": "https://caresyncstoragedip.dfs.core.windows.net/"
+		},
+		"LS_AzureKeyVault_properties_typeProperties_baseUrl": {
+			"value": "https://caresynckvaultdip.vault.azure.net/"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_server": {
+			"value": "dipaliserver.database.windows.net"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_database": {
+			"value": "dipalidb"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_userName": {
+			"value": "dipali"
 		}
 	}
 }

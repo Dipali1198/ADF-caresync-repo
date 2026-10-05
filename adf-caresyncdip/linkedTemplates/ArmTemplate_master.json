@@ -7,14 +7,6 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-caresyncdip"
 		},
-		"LS_PostgreSql_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'LS_PostgreSql'"
-		},
-		"LS_AzureKeyVault_properties_typeProperties_baseUrl": {
-			"type": "string",
-			"defaultValue": "https://caresynckeydip.vault.azure.net/"
-		},
 		"LS_PostgreSql_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ep-misty-wave-b3p8t579-pooler.c-4.ap-southeast-1.aws.neon.tech"
@@ -30,6 +22,22 @@
 		"LS_adls_gen2_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://caresyncstoragedip.dfs.core.windows.net/"
+		},
+		"LS_AzureKeyVault_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://caresynckvaultdip.vault.azure.net/"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "dipaliserver.database.windows.net"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "dipalidb"
+		},
+		"AzureSqlDatabase1_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "dipali"
 		},
 		"containerUri": {
 			"type": "string",
@@ -58,8 +66,8 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
-					"LS_PostgreSql_password": {
-						"value": "[parameters('LS_PostgreSql_password')]"
+					"LS_adls_gen2_properties_typeProperties_url": {
+						"value": "[parameters('LS_adls_gen2_properties_typeProperties_url')]"
 					},
 					"LS_AzureKeyVault_properties_typeProperties_baseUrl": {
 						"value": "[parameters('LS_AzureKeyVault_properties_typeProperties_baseUrl')]"
@@ -73,8 +81,14 @@
 					"LS_PostgreSql_properties_typeProperties_username": {
 						"value": "[parameters('LS_PostgreSql_properties_typeProperties_username')]"
 					},
-					"LS_adls_gen2_properties_typeProperties_url": {
-						"value": "[parameters('LS_adls_gen2_properties_typeProperties_url')]"
+					"AzureSqlDatabase1_properties_typeProperties_server": {
+						"value": "[parameters('AzureSqlDatabase1_properties_typeProperties_server')]"
+					},
+					"AzureSqlDatabase1_properties_typeProperties_database": {
+						"value": "[parameters('AzureSqlDatabase1_properties_typeProperties_database')]"
+					},
+					"AzureSqlDatabase1_properties_typeProperties_userName": {
+						"value": "[parameters('AzureSqlDatabase1_properties_typeProperties_userName')]"
 					}
 				}
 			},
