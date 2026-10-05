@@ -7,25 +7,13 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-caresyncdip"
 		},
-		"LS_adls_gen2_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://caresyncstoragedip.dfs.core.windows.net/"
-		},
 		"LS_AzureKeyVault_properties_typeProperties_baseUrl": {
 			"type": "string",
 			"defaultValue": "https://caresynckvaultdip.vault.azure.net/"
 		},
-		"LS_PostgreSql_properties_typeProperties_server": {
+		"LS_adls_gen2_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "ep-misty-wave-b3p8t579-pooler.c-4.ap-southeast-1.aws.neon.tech"
-		},
-		"LS_PostgreSql_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "neondb"
-		},
-		"LS_PostgreSql_properties_typeProperties_username": {
-			"type": "string",
-			"defaultValue": "neondb_owner"
+			"defaultValue": "https://caresyncstoragedip.dfs.core.windows.net/"
 		},
 		"AzureSqlDatabase1_properties_typeProperties_server": {
 			"type": "string",
@@ -38,25 +26,28 @@
 		"AzureSqlDatabase1_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "dipali"
+		},
+		"LS_AzureDatabricks_properties_typeProperties_existingClusterId": {
+			"type": "string",
+			"defaultValue": "1005-042228-3k0t11uj"
+		},
+		"LS_PostgreSql_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ep-misty-wave-b3p8t579-pooler.c-4.ap-southeast-1.aws.neon.tech"
+		},
+		"LS_PostgreSql_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "neondb"
+		},
+		"LS_PostgreSql_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "neondb_owner"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_adls_gen2')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobFS",
-				"typeProperties": {
-					"url": "[parameters('LS_adls_gen2_properties_typeProperties_url')]"
-				}
-			},
-			"dependsOn": []
-		},
 		{
 			"name": "[concat(parameters('factoryName'), '/LS_AzureKeyVault')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -71,32 +62,17 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/LS_PostgreSql')]",
+			"name": "[concat(parameters('factoryName'), '/LS_adls_gen2')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
-				"type": "PostgreSqlV2",
+				"type": "AzureBlobFS",
 				"typeProperties": {
-					"server": "[parameters('LS_PostgreSql_properties_typeProperties_server')]",
-					"port": 5432,
-					"database": "[parameters('LS_PostgreSql_properties_typeProperties_database')]",
-					"username": "[parameters('LS_PostgreSql_properties_typeProperties_username')]",
-					"password": {
-						"type": "AzureKeyVaultSecret",
-						"store": {
-							"referenceName": "LS_AzureKeyVault",
-							"type": "LinkedServiceReference"
-						},
-						"secretName": "postgresspassword"
-					},
-					"sslMode": 2,
-					"authenticationType": "Basic"
+					"url": "[parameters('LS_adls_gen2_properties_typeProperties_url')]"
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS_AzureKeyVault')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DS_Parquet')]",
@@ -166,6 +142,76 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/LS_AzureDatabricks')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-7405615849113038.18.azuredatabricks.net",
+					"accessToken": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "LS_AzureKeyVault",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "databricks-token"
+					},
+					"existingClusterId": "[parameters('LS_AzureDatabricks_properties_typeProperties_existingClusterId')]"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_AzureKeyVault')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_PostgreSql')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "PostgreSqlV2",
+				"typeProperties": {
+					"server": "[parameters('LS_PostgreSql_properties_typeProperties_server')]",
+					"port": 5432,
+					"database": "[parameters('LS_PostgreSql_properties_typeProperties_database')]",
+					"username": "[parameters('LS_PostgreSql_properties_typeProperties_username')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "LS_AzureKeyVault",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "postgresspassword"
+					},
+					"sslMode": 2,
+					"authenticationType": "Basic"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_AzureKeyVault')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_AzureSqlTable')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabase1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_PostgreSqlTable')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -181,6 +227,275 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/LS_PostgreSql')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PL_SOURCE_TO_SILVER_INNER')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Read table details",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "select * from ctrl.table_config where table_id = @{pipeline().parameters.table_id}",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DS_AzureSqlTable",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": true
+						}
+					},
+					{
+						"name": "Set start time",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "start_time",
+							"value": {
+								"value": "@formatDateTime(utcNow(),'yyyy-MM-dd_hh:mm:ss')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Source to landing ingestion",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Read table details",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Set start time",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "PostgreSqlV2Source",
+								"query": {
+									"value": "SELECT * FROM PUBLIC.@{activity('Read table details').output.firstRow.source_table_name}",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00"
+							},
+							"sink": {
+								"type": "ParquetSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "ParquetWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_PostgreSqlTable",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_Parquet",
+								"type": "DatasetReference",
+								"parameters": {
+									"container": "landing",
+									"folder": {
+										"value": "@concat(\n    activity('Read table details').output.firstRow.source_system,\n    '/',\n    activity('Read table details').output.firstRow.source_table_name,\n    '/',\n    variables('start_time')\n)",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					},
+					{
+						"name": "Landing to bronze",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "Source to landing ingestion",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Caresync-repo/landing_to-bronze",
+							"baseParameters": {
+								"source_system": {
+									"value": "@activity('Read table details').output.firstRow.source_system",
+									"type": "Expression"
+								},
+								"table_name": {
+									"value": "@activity('Read table details').output.firstRow.bronze_table_name",
+									"type": "Expression"
+								},
+								"landing_timestamp": {
+									"value": "@variables('start_time')",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "LS_AzureDatabricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Bronze to silver",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "Landing to bronze",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Caresync-repo/bronze_to_silver",
+							"baseParameters": {
+								"table_name": {
+									"value": "@activity('Read table details').output.firstRow.silver_table_name",
+									"type": "Expression"
+								},
+								"landing_timestamp": {
+									"value": "@variables('start_time')",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "LS_AzureDatabricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Update Success status",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "Bronze to silver",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "AzureSqlDatabase1",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "UPDATE ctrl.audit_log\nSET STATUS = 'SUCCESS' , end_time = SYSUTCDATETIME(), records_written = @{activity('Bronze to silver').output.runOutput}\nWHERE adf_run_id = '@{pipeline().parameters.adf_run_id}' and table_id = @{pipeline().parameters.table_id};",
+										"type": "Expression"
+									}
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"table_id": {
+						"type": "string",
+						"defaultValue": "1"
+					},
+					"adf_run_id": {
+						"type": "string"
+					}
+				},
+				"variables": {
+					"start_time": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_AzureSqlTable')]",
+				"[concat(variables('factoryId'), '/datasets/DS_PostgreSqlTable')]",
+				"[concat(variables('factoryId'), '/datasets/DS_Parquet')]",
+				"[concat(variables('factoryId'), '/linkedServices/LS_AzureDatabricks')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
 			]
 		},
 		{
@@ -253,6 +568,184 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DS_PostgreSqlTable')]",
 				"[concat(variables('factoryId'), '/datasets/DS_Parquet')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PL_SOURCE_SILVER_MAIN')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Read source table list",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 2,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "select table_id from ctrl.table_config where is_active = 1 and source_system  = '@{pipeline().parameters.source_system}'",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "DS_AzureSqlTable",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "Ingest all tables",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Read source table list",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Read source table list').output.value",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Ingest from source to silver",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "Insert In progress status",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "PL_SOURCE_TO_SILVER_INNER",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"table_id": {
+												"value": "@item().table_id",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "Insert In progress status",
+									"type": "Script",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"linkedServiceName": {
+										"referenceName": "AzureSqlDatabase1",
+										"type": "LinkedServiceReference"
+									},
+									"typeProperties": {
+										"scripts": [
+											{
+												"type": "Query",
+												"text": {
+													"value": "INSERT INTO ctrl.audit_log\n(\n    adf_run_id,\n    table_id,\n    stage,\n    Status,\n    start_time\n    \n)\nVALUES\n(\n   '@{pipeline().parameters.adf_run_id}',\n   @{item().table_id},\n   'SOURCE_TO_SILVER',\n   'IN_PROGRESS',\n   SYSUTCDATETIME()\n);",
+													"type": "Expression"
+												}
+											}
+										],
+										"scriptBlockExecutionTimeout": "02:00:00"
+									}
+								},
+								{
+									"name": "Update failed status",
+									"type": "Script",
+									"dependsOn": [
+										{
+											"activity": "Ingest from source to silver",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"linkedServiceName": {
+										"referenceName": "AzureSqlDatabase1",
+										"type": "LinkedServiceReference"
+									},
+									"typeProperties": {
+										"scripts": [
+											{
+												"type": "Query",
+												"text": {
+													"value": "UPDATE ctrl.audit_log\nSET STATUS = 'FAILED' , end_time = SYSUTCDATETIME()\nWHERE adf_run_id = '@{item().adf_run_id}' and table_id = @{item().table_id};",
+													"type": "Expression"
+												}
+											}
+										],
+										"scriptBlockExecutionTimeout": "02:00:00"
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"source_system": {
+						"type": "string",
+						"defaultValue": "neon_postgres"
+					},
+					"adf_run_id": {
+						"type": "string",
+						"defaultValue": "a3"
+					}
+				},
+				"variables": {
+					"test": {
+						"type": "Integer"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_AzureSqlTable')]",
+				"[concat(variables('factoryId'), '/pipelines/PL_SOURCE_TO_SILVER_INNER')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase1')]"
 			]
 		}
 	]
